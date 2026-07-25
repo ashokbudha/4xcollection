@@ -31,6 +31,8 @@ function App() {
       {products.map((product,index) => {
         return <p key={index}>{product}</p>;
       })}
+
+      <h2 style={{ color: "blue" }}>what are the products?</h2>
     </>
   );
 }
