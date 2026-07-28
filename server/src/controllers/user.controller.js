@@ -217,9 +217,70 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
 
 })
 
+const getCurrentUser = asyncHandler(async (req, res) => {
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            req.user,
+            "Current user fetched successfully"
+        )
+    );
+});
+
+const changeCurrentPassword = asyncHandler(async (req, res) => {
+
+    const { oldPassword, newPassword } = req.body;
+
+    if (!oldPassword || !newPassword) {
+        throw new ApiError(
+            400,
+            "Old password and new password are required"
+        );
+    }
+
+    const user = await User.findById(req.user._id)
+        .select("+password");
+
+    const isPasswordValid =
+        await user.isPasswordCorrect(oldPassword);
+
+    if (!isPasswordValid) {
+        throw new ApiError(
+            401,
+            "Old password is incorrect"
+        );
+    }
+
+    user.password = newPassword;
+
+    if (oldPassword === newPassword) {
+    throw new ApiError(
+        400,
+        "New password must be different from the old password"
+    );}
+
+    await user.save();
+
+    return res.status(200).json(
+        new ApiResponse(
+            200,
+            {},
+            "Password changed successfully"
+        )
+    );
+
+});
+
+
+// update profile remaining
+
+// update avatar remaining
+
 export {
     registerUser,
     loginUser,
     logoutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    getCurrentUser,
+    changeCurrentPassword,
 }
