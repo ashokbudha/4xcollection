@@ -68,10 +68,10 @@ const userSchema = new mongoose.Schema({
 },{timestamps:true});
 
 userSchema.pre("save", async function (next){
-  if(!this.isModified("password"))  return next();   //to make sure it encrypt password only when password is modified in userSchema
+  if(!this.isModified("password"))  return ;   //to make sure it encrypt password only when password is modified in userSchema
 
     this.password = await bcrypt.hash(this.password,10)
-  next();
+  // next();
 } )
 
 userSchema.methods.isPasswordCorrect = async function(password){
