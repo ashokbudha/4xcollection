@@ -18,6 +18,7 @@ const generateAccessAndRefreshTokens = async(userId) =>{
 
 
     } catch (error) {
+        console.log(error);
         throw new ApiError(500, "Something went wrong while generating referesh and access token")
     }
 }
@@ -34,6 +35,10 @@ const registerUser = asyncHandler(async (req, res) => {
         )
     ) {
         throw new ApiError(400, "All fields are required");
+    }
+
+    if(password.length<=8){
+        throw new ApiError(400, "Password must be 8 character.");
     }
 
     // Check if user already exists
