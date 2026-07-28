@@ -7,7 +7,6 @@ const PORT = process.env.PORT || 3000;
 
 connectDB()
   .then(() => {
-
     app.on("error", (error) => {
       console.error("Express App Error:", error);
       throw error;
