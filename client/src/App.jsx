@@ -1,6 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Navbar from "./components/Navbar";
+import LoginPage from "./components/LoginPage";
+import Signup from "./components/Signup";
+import Footer from "./components/Footer";
 import "./App.css";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/";
@@ -33,6 +36,7 @@ function App() {
   const [activeCategory, setActiveCategory] = useState("All");
   const [savedProducts, setSavedProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [authModal, setAuthModal] = useState(null);
 
   async function fetchProducts() {
     setLoading(true);
@@ -110,11 +114,13 @@ function App() {
           setSearchQuery("");
           setActiveCategory("All");
         }}
+        onLoginClick={() => setAuthModal("login")}
+        onSignupClick={() => setAuthModal("signup")}
       />
 
       <section className="hero" id="top">
         <p className="eyebrow">Curated essentials</p>
-        <h1>Pieces you will reach for, every day.</h1>
+        <h1>Dress for the movement.</h1>
         <p>Discover a small, versatile collection built around comfort and simple, lasting style.</p>
         <a className="primary-button" href="#collection">Shop collection <span aria-hidden="true">↓</span></a>
       </section>
@@ -232,6 +238,20 @@ function App() {
           </section>
         </div>
       )}
+
+      {authModal === "login" && (
+        <LoginPage
+          onClose={() => setAuthModal(null)}
+          onShowSignup={() => setAuthModal("signup")}
+        />
+      )}
+      {authModal === "signup" && (
+        <Signup
+          onClose={() => setAuthModal(null)}
+          onShowLogin={() => setAuthModal("login")}
+        />
+      )}
+      <Footer />
     </main>
   );
 }

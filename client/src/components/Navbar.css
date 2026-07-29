@@ -54,6 +54,11 @@
   font-size: 0.9rem;
 }
 
+.nav-actions button:hover {
+  cursor: pointer;
+  color: #172017;
+}
+
 .search-container {
   display: flex;
   align-items: center;

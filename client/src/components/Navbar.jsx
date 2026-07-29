@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Search, X } from "lucide-react";
 import "./Navbar.css";
 
-function Navbar({ searchQuery, onSearchChange, onShowAll }) {
+function Navbar({ searchQuery, onSearchChange, onShowAll, onLoginClick, onSignupClick }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   function toggleSearch() {
@@ -16,6 +16,12 @@ function Navbar({ searchQuery, onSearchChange, onShowAll }) {
   function showAllProducts(event) {
     event.preventDefault();
     onShowAll();
+  }
+
+  function handleLoginClick() {
+    if (onLoginClick) {
+      onLoginClick();
+    }
   }
 
   return (
@@ -63,8 +69,12 @@ function Navbar({ searchQuery, onSearchChange, onShowAll }) {
             </button>
           )}
         </div>
-        <button className="login-button" type="button">Login</button>
-        <button className="signup-button" type="button">Sign Up</button>
+        <button className="login-button" type="button" onClick={handleLoginClick}>
+          Login
+        </button>
+        <button className="signup-button" type="button" onClick={onSignupClick}>
+          Sign Up
+        </button>
       </div>
     </div>
   );
