@@ -2,7 +2,10 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import { errorHandler} from "./middlewares/error.middleware.js";
-import userRouter from "./routes/user.route.js"
+import userRouter from "./routes/user.route.js";
+import categoryRouter from "./routes/category.route.js";
+import productRouter from "./routes/product.route.js"
+import cartRouter from "./routes/cart.route.js";
 
 const app = express();
 
@@ -42,6 +45,10 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/users",userRouter);
+app.use("/category",categoryRouter);
+app.use("/product",productRouter);
+app.use("./cart",cartRouter);
+app.use("/wishlist",wishlistRouter);
 
 // Error Handler (Always Last)
 app.use(errorHandler);
