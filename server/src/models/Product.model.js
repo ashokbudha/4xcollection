@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import slugify from "slugify";
+import { PRODUCT_STATUS } from "../constants";
 
 const productVariantSchema = new mongoose.Schema(
   {
@@ -34,7 +35,7 @@ const productVariantSchema = new mongoose.Schema(
       default: 0,
       min: [0, "Stock cannot be negative."],
     },
-    images: {
+    Variantimages: {
       type: [String],
       default: [],
     },
@@ -90,8 +91,8 @@ const productSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["active", "draft", "archived"],
-      default: "draft",
+      enum: PRODUCT_STATUS,
+      default: "active",
     },
     variants: {
       type: [productVariantSchema],
