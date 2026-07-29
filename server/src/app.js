@@ -48,6 +48,7 @@ app.use("/api/v1/users",userRouter);
 app.use("/category",categoryRouter);
 app.use("/product",productRouter);
 app.use("./cart",cartRouter);
+app.use("/wishlist",wishlistRouter);
 
 // Error Handler (Always Last)
 app.use(errorHandler);
