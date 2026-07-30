@@ -1,20 +1,51 @@
 import { Router } from "express";
 import { verifyJWT } from "../middlewares/auth.middleware.js";
-import {verifyAdmin} from "../middlewares/verifyAdmin.middleware.js"
+import { verifyAdmin } from "../middlewares/verifyAdmin.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
-import { getCategories,getCategory,createCategory,deleteCategory,updateCategory } from "../controllers/category.controller.js";
+
+import {
+  getCategories,
+  getCategory,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+} from "../controllers/category.controller.js";
 
 const router = Router();
 
+// ---------- Public ----------
 
 router.route("/")
-.post(verifyJWT,verifyAdmin,upload.fields([{name:"imageUrl",maxCount:1}]),createCategory)
-.get(getCategories);
+  .get(getCategories);
 
 router.route("/:id")
-.get(getCategory)
-.patch(verifyJWT,verifyAdmin,upload.fields([{name:"imageUrl", maxCount:1,}]),updateCategory)
-.delete(verifyJWT, verifyAdmin,deleteCategory);
+  .get(getCategory);
 
+// ---------- Admin ----------
+
+router.use(verifyJWT,verifyAdmin);
+
+router.route("/admin")
+  .post(
+    upload.fields([
+      {
+        name: "imageUrl",
+        maxCount: 1,
+      },
+    ]),
+    createCategory
+  );
+
+router.route("/admin/:id")
+  .patch(
+    upload.fields([
+      {
+        name: "imageUrl",
+        maxCount: 1,
+      },
+    ]),
+    updateCategory
+  )
+  .delete(deleteCategory);
 
 export default router;
