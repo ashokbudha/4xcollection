@@ -277,15 +277,160 @@ const changeCurrentPassword = asyncHandler(async (req, res) => {
 });
 
 
-// update profile remaining
+//todo: update profile remaining
 
-// update avatar remaining
+//todo: update avatar remaining
+
+
+// ----------------------Admin User Controllers------------------------------------------------
+
+const getAllUsers = asyncHandler(async (req, res) => {
+  const users = await User.find()
+    .select("-password -refreshToken")
+    .sort({ createdAt: -1 });
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      users,
+      "Users fetched successfully."
+    )
+  );
+});
+
+const getUserByIdAdmin = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, "Invalid user ID.");
+  }
+
+  const user = await User.findById(id).select(
+    "-password -refreshToken"
+  );
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      user,
+      "User fetched successfully."
+    )
+  );
+});
+
+
+const updateUserRole = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { role } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, "Invalid user ID.");
+  }
+
+  const validRoles = ["user", "admin"];
+
+  if (!validRoles.includes(role)) {
+    throw new ApiError(400, "Invalid role.");
+  }
+
+  const user = await User.findById(id);
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  user.role = role;
+
+  await user.save();
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      user,
+      "User role updated successfully."
+    )
+  );
+});
+
+
+const updateUserStatus = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+  const { isActive } = req.body;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, "Invalid user ID.");
+  }
+
+  if (typeof isActive !== "boolean") {
+    throw new ApiError(
+      400,
+      "isActive must be true or false."
+    );
+  }
+
+  const user = await User.findById(id);
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  user.isActive = isActive;
+
+  await user.save();
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      user,
+      `User ${
+        isActive ? "activated" : "deactivated"
+      } successfully.`
+    )
+  );
+});
+
+const deleteUser = asyncHandler(async (req, res) => {
+  const { id } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(id)) {
+    throw new ApiError(400, "Invalid user ID.");
+  }
+
+  const user = await User.findById(id);
+
+  if (!user) {
+    throw new ApiError(404, "User not found.");
+  }
+
+  user.isActive = false;
+
+  await user.save();
+
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      {},
+      "User deleted successfully."
+    )
+  );
+});
+
 
 export {
-    registerUser,
-    loginUser,
-    logoutUser,
-    refreshAccessToken,
-    getCurrentUser,
-    changeCurrentPassword,
-}
+  registerUser,
+  loginUser,
+  logoutUser,
+  refreshAccessToken,
+  changeCurrentPassword,
+  getCurrentUser,
+
+  getAllUsers,
+  getUserByIdAdmin,
+  updateUserRole,
+  updateUserStatus,
+  deleteUser,
+};
