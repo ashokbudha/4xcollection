@@ -8,6 +8,7 @@ import productRouter from "./routes/product.route.js"
 import cartRouter from "./routes/cart.route.js";
 import wishlistRouter  from "./routes/wishlist.route.js";
 import addressRouter from "./routes/address.route.js";
+import orderRouter from  "./routes/order.router.js";
 
 const app = express();
 
@@ -46,12 +47,13 @@ app.get("/", (req, res) => {
   ]);
 });
 
-app.use("/api/v1/users",userRouter);
-app.use("/category",categoryRouter);
-app.use("/product",productRouter);
-app.use("./cart",cartRouter);
-app.use("/wishlist",wishlistRouter);
-app.use("/address",addressRoute);
+app.use("/api/v1/users", userRouter);
+app.use("/api/v1/categories", categoryRouter);
+app.use("/api/v1/products", productRouter);
+app.use("/api/v1/cart", cartRouter);
+app.use("/api/v1/wishlist", wishlistRouter);
+app.use("/api/v1/addresses", addressRouter);
+app.use("/api/v1/orders", orderRouter);
 
 // Error Handler (Always Last)
 app.use(errorHandler);
