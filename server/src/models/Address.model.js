@@ -47,6 +47,10 @@ const addressSchema = new mongoose.Schema({
     default: null,
     trim: true,
   },
+  isDefault: {
+  type: Boolean,
+  default: false,
+}
 });
 
 export const Address = mongoose.model("Address", addressSchema);
