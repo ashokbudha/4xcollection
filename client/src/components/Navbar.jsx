@@ -1,85 +1,75 @@
-import { useState } from "react";
-import { Search, X, ShoppingBag } from "lucide-react";
-import "./Navbar.css";
+import { ShoppingBag, Search } from "lucide-react";
+import { Link } from "react-router-dom";
 
-function Navbar({ searchQuery, onSearchChange, onShowAll, onLoginClick, onSignupClick, onCartClick }) {
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-
-  function toggleSearch() {
-    if (isSearchOpen) {
-      onSearchChange("");
-    }
-
-    setIsSearchOpen((current) => !current);
-  }
-
-  function showAllProducts(event) {
-    event.preventDefault();
-    onShowAll();
-  }
-
-  function handleLoginClick() {
-    if (onLoginClick) {
-      onLoginClick();
-    }
-  }
-
+function Navbar() {
   return (
-    <div className="navbar">
-      <a className="brand" href="#top">
-        4X<span>COLLECTION</span>
-      </a>
+    <header className="sticky top-0 z-50 border-b bg-white">
+      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-10">
+        {/* Logo */}
+        <Link
+          to="/"
+          className="text-2xl font-bold tracking-[0.35em] text-black"
+        >
+          4X<span className="font-light">COLLECTION</span>
+        </Link>
 
-      <div className="nav-links">
-        <a href="#collection" onClick={showAllProducts}>ALL</a>
-        <a href="#collection">WOMEN</a>
-        <a href="#about">MEN</a>
-        <a href="#about">SELL</a>
-      </div>
+        {/* Navigation */}
+        <nav className="hidden items-center gap-10 md:flex">
+          <Link
+            to="/products"
+            className="border-b-2 border-black pb-1 text-sm font-medium uppercase tracking-wider"
+          >
+            All
+          </Link>
 
-      <div className="nav-actions">
-        <div className="search-container">
-          {isSearchOpen ? (
-            <>
-              <input
-                type="text"
-                className="search-input"
-                placeholder="Search..."
-                value={searchQuery}
-                onChange={(event) => onSearchChange(event.target.value)}
-                autoFocus
-              />
-              <button
-                type="button"
-                className="search-toggle-button"
-                onClick={toggleSearch}
-                aria-label="Close search"
-              >
-                <X size={18} />
-              </button>
-            </>
-          ) : (
-            <button
-              type="button"
-              className="search-toggle-button"
-              onClick={toggleSearch}
-              aria-label="Search"
-            >
-              <Search size={18} />
-            </button>
-          )}
+          <Link
+            to="/products?category=women"
+            className="text-sm font-medium uppercase tracking-wider text-gray-600 transition hover:text-black"
+          >
+            Women
+          </Link>
+
+          <Link
+            to="/products?category=men"
+            className="text-sm font-medium uppercase tracking-wider text-gray-600 transition hover:text-black"
+          >
+            Men
+          </Link>
+        </nav>
+
+        {/* Actions */}
+        <div className="flex items-center gap-5">
+          <button
+            className="text-gray-700 transition hover:text-black"
+            aria-label="Search"
+          >
+            <Search size={20} strokeWidth={1.8} />
+          </button>
+
+          <Link
+            to="/cart"
+            className="text-gray-700 transition hover:text-black"
+            aria-label="Cart"
+          >
+            <ShoppingBag size={20} strokeWidth={1.8} />
+          </Link>
+
+          <Link
+            to="/login"
+            className="hidden rounded-md border border-black px-4 py-2 text-sm font-medium transition hover:bg-black hover:text-white lg:block"
+          >
+            Login
+          </Link>
+
+          <Link
+            to="/register"
+            className="hidden rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 lg:block"
+          >
+            Sign Up
+          </Link>
         </div>
-        <button className="login-button" type="button" onClick={handleLoginClick}>
-          Login
-        </button>
-        <button className="signup-button" type="button" onClick={onSignupClick}>
-          Sign Up
-        </button>
-        <button className="ShoppingCart" type="button" onClick={onCartClick}>
-          <ShoppingBag size={18} />
-        </button>
       </div>
-    </div>
+    </header>
   );
 }
 
