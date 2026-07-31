@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Search, X } from "lucide-react";
+import { Search, X, ShoppingBag } from "lucide-react";
 import "./Navbar.css";
 
-function Navbar({ searchQuery, onSearchChange, onShowAll, onLoginClick, onSignupClick }) {
+function Navbar({ searchQuery, onSearchChange, onShowAll, onLoginClick, onSignupClick, onCartClick }) {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   function toggleSearch() {
@@ -74,6 +74,9 @@ function Navbar({ searchQuery, onSearchChange, onShowAll, onLoginClick, onSignup
         </button>
         <button className="signup-button" type="button" onClick={onSignupClick}>
           Sign Up
+        </button>
+        <button className="ShoppingCart" type="button" onClick={onCartClick}>
+          <ShoppingBag size={18} />
         </button>
       </div>
     </div>
