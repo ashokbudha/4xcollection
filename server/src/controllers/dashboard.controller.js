@@ -1,7 +1,7 @@
-import { User } from "../models/user.model.js";
-import { Category } from "../models/category.model.js";
-import { Product } from "../models/product.model.js";
-import { Order } from "../models/order.model.js";
+import { User } from "../models/User.model.js";
+import { Category } from "../models/Category.model.js";
+import { Product } from "../models/Product.model.js";
+import { Order } from "../models/Order.model.js";
 
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
@@ -39,6 +39,21 @@ const getDashboardStats = asyncHandler(async (req, res) => {
   });
 
   // Revenue
+  const revenue = await Order.aggregate([
+  {
+    $match: {
+      orderStatus: "delivered",
+    },
+  },
+  {
+    $group: {
+      _id: null,
+      totalRevenue: {
+        $sum: "$totalAmount",
+      },
+    },
+  },
+]);
 
 
   // Recent Orders

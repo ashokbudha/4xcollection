@@ -14,24 +14,17 @@ import {
 
 const router = Router();
 
-// ---------------- Customer ----------------
-
 router.use(verifyJWT);
 
+// Customer routes without params
 router.route("/")
   .post(createOrder)
   .get(getMyOrders);
 
-router.route("/:orderId")
-  .get(getOrderById);
-
-router.route("/:orderId/cancel")
-  .patch(cancelOrder);
-
-// ---------------- Admin ----------------
-
+// Admin middleware
 router.use("/admin", verifyAdmin);
 
+// Admin routes
 router.route("/admin")
   .get(getAllOrders);
 
@@ -40,5 +33,12 @@ router.route("/admin/:orderId")
 
 router.route("/admin/:orderId/status")
   .patch(updateOrderStatus);
+
+// Customer routes with params (keep these last)
+router.route("/:orderId")
+  .get(getOrderById);
+
+router.route("/:orderId/cancel")
+  .patch(cancelOrder);
 
 export default router;

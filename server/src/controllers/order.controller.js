@@ -1,8 +1,9 @@
 import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import mongoose from "mongoose";
-import { Cart } from "../models/cart.model.js";
-import { Order } from "../models/order.model.js";
+import { Cart } from "../models/Cart.model.js";
+import { Order } from "../models/Order.model.js";
 import {
   validateAddress,
   buildOrderItems,
@@ -248,7 +249,7 @@ const cancelOrder = asyncHandler(async (req, res) => {
   }
 
   // 6. Restore product stock
-  await restoreInventory(order.orderItems);
+  await restoreInventory(order.items);
 
   // 7. Update order status
   order.orderStatus = "cancelled";

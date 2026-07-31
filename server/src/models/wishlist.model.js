@@ -16,8 +16,8 @@ const wishListItemSchema = new mongoose.Schema({
     default:Date.now,
   },
 
-},{_id:false});
-const wishListSchema = new mongoose.Schema({
+});
+const wishlistSchema = new mongoose.Schema({
   userId:{
     type:mongoose.Schema.Types.ObjectId,
     ref:"User",
@@ -32,4 +32,4 @@ const wishListSchema = new mongoose.Schema({
 
 },{timestamps:true});
 
-export const WishList = mongoose.model("WishList",wishListSchema);
+export const Wishlist = mongoose.model("Wishlist",wishlistSchema);

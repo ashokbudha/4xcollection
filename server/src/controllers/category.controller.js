@@ -22,18 +22,21 @@ const createCategory = asyncHandler(async (req, res) => {
     throw new ApiError(400, "Category name is required.");
   }
 
+  
   const existingCategory = await Category.findOne({ name: name.toLowerCase() });
   if (existingCategory) {
     throw new ApiError(409, "Category already exists.");
   }
-
+  
+  const normalizedParentId = parentId?.trim() ? parentId : null;
   // check if parent category exist
-  if (parentId) {
-    const parentCategory = await Category.findById(parentId);
-    if (!parentCategory) {
-      throw new ApiError(404, "Parent category not found");
-    }
+if (normalizedParentId) {
+  const parentCategory = await Category.findById(normalizedParentId);
+
+  if (!parentCategory) {
+    throw new ApiError(404, "Parent category not found.");
   }
+}
 
   const imageLocalPath = req.files?.imageUrl?.[0]?.path;
 
@@ -48,7 +51,7 @@ const createCategory = asyncHandler(async (req, res) => {
   const category = await Category.create({
     name,
     imageUrl: image?.url || null,
-    parentId,
+    parentId:normalizedParentId,
   });
 
   return res
@@ -115,13 +118,19 @@ const updateCategory = asyncHandler(async (req, res) => {
   const { name, parentId, isActive } = req.body;
   const imageLocalPath = req.files?.imageUrl?.[0]?.path;
 
-  if (parentId) {
-    const parentCategory = await Category.findById(parentId);
+  const normalizedParentId = parentId?.trim() || null;
 
-    if (!parentCategory) {
-      throw new ApiError(404, "Parent category not found.");
-    }
+ if (normalizedParentId) {
+  const parentCategory = await Category.findById(normalizedParentId);
+
+  if (normalizedParentId === id) {
+  throw new ApiError(400, "A category cannot be its own parent.");
+}
+
+  if (!parentCategory) {
+    throw new ApiError(404, "Parent category not found.");
   }
+}
 
   if (name && !name.trim()) {
     throw new ApiError(400, "Category name cannot be empty.");
@@ -158,12 +167,17 @@ const updateCategory = asyncHandler(async (req, res) => {
 
     category.imageUrl = image.url;
   }
+if (name) {
+  category.name = name.trim();
+}
 
-  if (name) category.name = name;
+if (parentId !== undefined) {
+  category.parentId = normalizedParentId;
+}
 
-  if (parentId !== undefined) category.parentId = parentId;
-
-  if (isActive !== undefined) category.isActive = isActive;
+ if (isActive !== undefined) {
+  category.isActive = isActive === "true";
+}
 
   await category.save();
 
