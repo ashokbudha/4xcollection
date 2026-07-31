@@ -4,6 +4,7 @@ import Navbar from "./components/Navbar";
 import LoginPage from "./components/LoginPage";
 import Signup from "./components/Signup";
 import Footer from "./components/Footer";
+import bannerImage from "./assets/banner.jpg";
 import "./App.css";
 
 const API_URL = import.meta.env.VITE_API_URL ?? "http://localhost:3000/";
@@ -118,11 +119,18 @@ function App() {
         onSignupClick={() => setAuthModal("signup")}
       />
 
-      <section className="hero" id="top">
-        <p className="eyebrow">Curated essentials</p>
-        <h1>Dress for the movement.</h1>
-        <p>Discover a small, versatile collection built around comfort and simple, lasting style.</p>
-        <a className="primary-button" href="#collection">Shop collection <span aria-hidden="true">↓</span></a>
+      <section
+        className="bg-[url('./assets/banner.jpg')] bg-cover bg-center bg-no-repeat pt-[104px] pb-[112px] text-white max-[720px]:pt-[72px] max-[720px]:pb-[78px]"
+        id="top"
+      >
+        <div className="px-[100px] justify-items-center">
+          <p className="text-[0.72rem] font-extrabold uppercase tracking-[0.14em]">Curated essentials</p>
+          <h1 className="max-w-[550px] font-[Georgia,'Times_New_Roman',serif] text-[clamp(3rem,7vw,6.4rem)] font-medium leading-[0.92] tracking-[-0.06em]">Dress for the movement.</h1>
+          <p className="max-w-[850px] text-[1.05rem] leading-[1.65] text-[#596158]">Discover a small, versatile collection built around comfort and simple, lasting style.</p>
+          <a className="mt-[22px] inline-block rounded-full bg-[#1d2a1e] px-5 py-3.5 font-bold text-white no-underline" href="#collection">
+            Shop collection <span className="ml-4" aria-hidden="true">↓</span>
+          </a>
+        </div>
       </section>
 
       <section className="collection-section" id="collection">
