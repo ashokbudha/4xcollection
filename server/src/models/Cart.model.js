@@ -3,8 +3,12 @@ import mongoose from "mongoose";
 const cartItemSchema = new mongoose.Schema({
   variantId:{
     type:mongoose.Schema.Types.ObjectId,
-    ref:"ProductVariant",
     required:[true, "Product Variant is required."],
+  },
+   productId:{
+    type:mongoose.Schema.Types.ObjectId,
+    ref:"Product",
+    required:[true, "Product is required."],
   },
   unitPrice:{
     type:Number,
@@ -17,7 +21,7 @@ const cartItemSchema = new mongoose.Schema({
     default:1,
     min:[1, "Quantity cannot be less than 1."]
   }
-},{_id:false})
+})
 
 
 

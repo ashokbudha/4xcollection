@@ -96,20 +96,22 @@ const addToCart = asyncHandler(async (req, res) => {
   );
 
   // 10. Increase quantity OR add new item
-  if (existingItem) {
-    existingItem.quantity += quantity;
+ if (existingItem) {
+  existingItem.quantity += quantity;
+  existingItem.unitPrice = variant.price;
 
-    if (existingItem.quantity > variant.stock) {
-      throw new ApiError(
-        400,
-        "Requested quantity exceeds available stock."
-      );
-    }
-  } else {
+  if (existingItem.quantity > variant.stock) {
+    throw new ApiError(
+      400,
+      "Requested quantity exceeds available stock."
+    );
+  }
+} else {
     cart.items.push({
       productId,
       variantId,
       quantity,
+       unitPrice: variant.price,
     });
   }
 
@@ -196,6 +198,7 @@ const updateCartItem = asyncHandler(async (req, res) => {
 
   // 1. Read cart item ID
   const { itemId } = req.params;
+  console.log(itemId)
 
   // 2. Read quantity
   const { quantity } = req.body;

@@ -32,11 +32,11 @@ const categorySchema = new mongoose.Schema(
 );
 
 // Auto generate slug from name
-categorySchema.pre("save", function (next) {
+categorySchema.pre("save", function () {
   if (this.isModified("name")) {
     this.slug = slugify(this.name, { lower: true, strict: true });
   }
-  next();
+  // next();
 });
 
 export const Category = mongoose.model("Category", categorySchema);

@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import { Address } from "../models/address.model.js";
+import { Address } from "../models/Address.model.js";
 import { ApiError } from "../utils/ApiError.js";
 
-import { Product } from "../models/product.model.js";
+import { Product } from "../models/Product.model.js";
 
 const validateAddress = async (addressId, userId) => {
   // Validate ObjectId

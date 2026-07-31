@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 import slugify from "slugify";
-import { PRODUCT_STATUS } from "../constants";
+import { PRODUCT_STATUS } from "../constants.js";
 
 const productVariantSchema = new mongoose.Schema(
   {
@@ -109,11 +109,10 @@ const productSchema = new mongoose.Schema(
 );
 
 // auto generate slug from name
-productSchema.pre("save", function (next) {
+productSchema.pre("save", function () {
   if (this.isModified("name")) {
     this.slug = slugify(this.name, { lower: true, strict: true });
   }
-  next();
 });
 
 export const Product = mongoose.model("Product", productSchema);

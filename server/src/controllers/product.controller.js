@@ -4,7 +4,7 @@ import { uploadOnCloudinary } from "../utils/cloudinary.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import mongoose from "mongoose";
 import { Product } from "../models/Product.model.js";
-import { Category } from "../models/category.model.js";
+import { Category } from "../models/Category.model.js";
 import { compare } from "bcrypt";
 import { PRODUCT_STATUS } from "../constants.js";
 
@@ -41,22 +41,29 @@ const createProduct = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(categoryId)) {
     throw new ApiError(400, "Invalid category id.");
   }
+let parsedFeatured;
 
-  let parsedFeatured = featured;
-
-  if (featured !== undefined) {
-    if (featured === "true") parsedFeatured = true;
-    else if (featured === "false") parsedFeatured = false;
-    else {
-      throw new ApiError(400, "Featured must be true or false.");
-    }
-  }
-
+if (featured === "" || featured === undefined) {
+  parsedFeatured = undefined;
+} else if (featured === "true") {
+  parsedFeatured = true;
+} else if (featured === "false") {
+  parsedFeatured = false;
+} else {
+  throw new ApiError(400, "Featured must be true or false.");
+}
   const allowedStatus = PRODUCT_STATUS;
+  
 
-  if (status !== undefined && !allowedStatus.includes(status)) {
+let parsedStatus = undefined;
+
+if (status?.trim()) {
+  if (!PRODUCT_STATUS.includes(status)) {
     throw new ApiError(400, "Invalid product status.");
   }
+
+  parsedStatus = status;
+}
 
   //3. Parse Variants JSON
   let parsedVariants;
@@ -260,7 +267,7 @@ const createProduct = asyncHandler(async (req, res) => {
     description: description?.trim(),
     brand: brand?.trim(),
     featured: parsedFeatured,
-    status,
+    status:parsedStatus,
     thumbnail: uploadedThumbnail.url,
     variants: mappedVariants,
   });
@@ -363,7 +370,8 @@ const getProductById = asyncHandler(async (req, res) => {
   // 14. Return stock availability by variant
 
    // 1. Read product ID
-  const { productId } = req.params;
+  const { id:productId } = req.params;
+
 
   // 2. Validate product ID
   if (!mongoose.Types.ObjectId.isValid(productId)) {
@@ -417,7 +425,11 @@ const updateProduct = asyncHandler(async (req, res) => {
   // 17. Optimistic concurrency/version control
 
    // 1. Read request
-  const { productId } = req.params;
+  const { id:productId } = req.params;
+
+  console.log("Params:", req.params);
+console.log("Headers:", req.headers["content-type"]);
+console.log("Body:", req.body);
 
   const {
     categoryId,
@@ -514,6 +526,7 @@ const updateProduct = asyncHandler(async (req, res) => {
 
 
 });
+
 const deleteProduct = asyncHandler(async (req, res) => {
   // ========= MVP =========
   // 1. Read product ID
@@ -529,7 +542,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
   // Restore deleted product
 
   // 1. Read product ID
-  const { productId } = req.params;
+  const { id:productId } = req.params;
 
   // 2. Validate product ID
   if (!mongoose.Types.ObjectId.isValid(productId)) {
@@ -546,7 +559,6 @@ const deleteProduct = asyncHandler(async (req, res) => {
   // 4. Permanently delete
     await Product.findByIdAndDelete(productId);
 
-  await product.save();
 
   // 5. Return response
   return res.status(200).json(
