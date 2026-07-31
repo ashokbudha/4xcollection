@@ -8,7 +8,7 @@ function Footer() {
   }
 
   return (
-    <footer className="mt-auto bg-[#172017] px-5 pb-6 pt-14 text-[#f7f7f2] sm:px-10">
+    <footer className="mt-auto bg-[#6870d5] px-5 pb-6 pt-14 text-[#f7f7f2] sm:px-10">
       <div className="mx-auto w-full max-w-7xl">
         <div className="grid gap-12 border-b border-white/15 pb-12 lg:grid-cols-[1.35fr_0.7fr_0.7fr_1.15fr]">
           <div>
