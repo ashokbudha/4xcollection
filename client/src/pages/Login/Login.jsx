@@ -2,6 +2,7 @@ import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../services/auth.service";
 import { useAuth } from "../../context/AuthContext";
+import { toast } from "react-hot-toast";
 
 const Login = () => {
   const {
@@ -14,12 +15,15 @@ const Login = () => {
 
   const onSubmit = async (data) => {
     try {
-      const result= await login(data);
-      console.log(result);
+      await login(data);
+   toast.success("Login successful.");
       await fetchCurrentUser();
       navigate("/");
     } catch (error) {
-     alert(error.response?.data?.message || "Something went wrong");
+     toast.error(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again.",
+      );
     }
   };
   return (
@@ -67,7 +71,13 @@ const Login = () => {
             <input
               id="login-email"
               type="email"
-              {...register("email", { required: "Email is required" })}
+              {...register("email", {
+  required: "Email is required",
+  pattern: {
+    value: /^\S+@\S+\.\S+$/,
+    message: "Invalid email address",
+  },
+})}
               autoComplete="email"
               placeholder="you@example.com"
               className="w-full rounded-xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40"
@@ -122,7 +132,8 @@ const Login = () => {
           <button
             type="submit"
             disabled={isSubmitting}
-            className="w-full rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-3 font-semibold text-white shadow-lg shadow-cyan-500/20 transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-800"
+            className="w-full rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-4 py-3 font-semibold text-white shadow-lg shadow-cyan-500/20 transition hover:opacity-90 focus:outline-none focus:ring-2 focus:ring-cyan-300 focus:ring-offset-2 focus:ring-offset-slate-800 disabled:cursor-not-allowed
+disabled:opacity-60"
           >
            {isSubmitting ? "Logging in..." : "Log in"}
           </button>

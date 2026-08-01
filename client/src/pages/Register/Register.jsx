@@ -1,6 +1,6 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import { register as registerUser } from "../../services/auth.service";
+import { register as registerUser } from "../../services/auth.service.js";
 import { toast } from "react-hot-toast";
 
 const Register = () => {
