@@ -1,7 +1,7 @@
-import React from "react";
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { login } from "../../services/auth.service";
+import { useAuth } from "../../context/AuthContext";
 
 const Login = () => {
   const {
@@ -10,12 +10,13 @@ const Login = () => {
     formState: { errors, isSubmitting },
   } = useForm();
   const navigate = useNavigate();
+  const { fetchCurrentUser } = useAuth();
 
   const onSubmit = async (data) => {
     try {
       const result= await login(data);
-
       console.log(result);
+      await fetchCurrentUser();
       navigate("/");
     } catch (error) {
      alert(error.response?.data?.message || "Something went wrong");

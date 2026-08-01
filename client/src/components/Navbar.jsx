@@ -1,11 +1,22 @@
 import { ShoppingBag, Search } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
+import { useNavigate } from "react-router-dom";
 
 function Navbar() {
+  const { user, isAuthenticated, logout } = useAuth();
+  const navigate = useNavigate();
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/");
+  };
+  console.log(user);
   return (
     <header className="sticky top-0 z-50 border-b bg-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-10">
         {/* Logo */}
+
         <Link
           to="/"
           className="text-2xl font-bold tracking-[0.35em] text-black"
@@ -54,19 +65,31 @@ function Navbar() {
             <ShoppingBag size={20} strokeWidth={1.8} />
           </Link>
 
-          <Link
-            to="/login"
-            className="hidden rounded-md border border-black px-4 py-2 text-sm font-medium transition hover:bg-black hover:text-white lg:block"
-          >
-            Login
-          </Link>
+      
 
-          <Link
-            to="/register"
-            className="hidden rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 lg:block"
-          >
-            Sign Up
-          </Link>
+          {isAuthenticated ? (
+            <>
+              <span className="text-sm font-medium">Hi, {user.fullName}</span>
+
+              <button onClick={handleLogout}>Logout</button>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="hidden rounded-md border border-black px-4 py-2 text-sm font-medium transition hover:bg-black hover:text-white lg:block"
+              >
+                Login
+              </Link>
+
+              <Link
+                to="/register"
+                className="hidden rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 lg:block"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
       </div>
     </header>
