@@ -14,7 +14,8 @@ const Register = () => {
       const result = await registerUser(data);
 
       console.log(result);
-      navigate("/");
+      alert("Registration successful. Please login.");
+      navigate("/login");
     } catch (error) {
       alert(error.response?.data?.message || "Something went wrong");
     }
@@ -65,15 +66,17 @@ const Register = () => {
             <input
               id="signup-name"
               type="text"
-              {...register("name", {
-                required: "Name is required",
+              {...register("fullName", {
+                required: "Full name is required",
               })}
               autoComplete="name"
               placeholder="Your name"
               className="w-full rounded-xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40"
             />
-            {errors.name && (
-              <p className="mt-1 text-sm text-red-400">{errors.name.message}</p>
+            {errors.fullName && (
+              <p className="mt-1 text-sm text-red-400">
+                {errors.fullName.message}
+              </p>
             )}
           </div>
 
@@ -95,6 +98,56 @@ const Register = () => {
             {errors.email && (
               <p className="mt-1 text-sm text-red-400">
                 {errors.email.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="signup-username"
+              className="mb-1 block text-sm font-medium text-slate-200"
+            >
+              Username
+            </label>
+
+            <input
+              id="signup-username"
+              type="text"
+              {...register("username", {
+                required: "Username is required",
+              })}
+              placeholder="Choose a username"
+              className="w-full rounded-xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40"
+            />
+
+            {errors.username && (
+              <p className="mt-1 text-sm text-red-400">
+                {errors.username.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="signup-phone"
+              className="mb-1 block text-sm font-medium text-slate-200"
+            >
+              Phone Number
+            </label>
+
+            <input
+              id="signup-phone"
+              type="tel"
+              {...register("phone", {
+                required: "Phone number is required",
+              })}
+              placeholder="9800000000"
+              className="w-full rounded-xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40"
+            />
+
+            {errors.phone && (
+              <p className="mt-1 text-sm text-red-400">
+                {errors.phone.message}
               </p>
             )}
           </div>
@@ -123,6 +176,39 @@ const Register = () => {
             {errors.password && (
               <p className="mt-1 text-sm text-red-400">
                 {errors.password.message}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label
+              htmlFor="signup-avatar"
+              className="mb-1 block text-sm font-medium text-slate-200"
+            >
+              Profile Picture
+            </label>
+
+            <input
+              id="signup-avatar"
+              type="file"
+              accept="image/*"
+              {...register("avatar", {
+                required: "Profile picture is required",
+              })}
+              className="block w-full text-sm text-slate-300
+    file:mr-4
+    file:rounded-lg
+    file:border-0
+    file:bg-cyan-500
+    file:px-4
+    file:py-2
+    file:text-white
+    hover:file:bg-cyan-600"
+            />
+
+            {errors.avatar && (
+              <p className="mt-1 text-sm text-red-400">
+                {errors.avatar.message}
               </p>
             )}
           </div>
