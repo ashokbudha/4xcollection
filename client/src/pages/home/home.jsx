@@ -8,10 +8,9 @@ const Home = () => {
       <Navbar/>
       <Hero/>
       <ProductCard/>
-      <h1>hello</h1>
       <Footer/>
     </div>
-  )
+  );
 }
 
 export default Home

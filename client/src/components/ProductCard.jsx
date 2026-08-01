@@ -57,6 +57,18 @@ const products = [
     badgeColor: "bg-red-500",
     image: tshirt,
   },
+  {
+    id: 5,
+    title: "Summer T-Shirt",
+    category: "tops",
+    price: "Rs.750",
+    oldPrice: "Rs.1000",
+    rating: "4.6",
+    reviews: "178",
+    badge: "SALE -20%",
+    badgeColor: "bg-red-500",
+    image: tshirt,
+  },
 ];
 
 function ProductCard() {
