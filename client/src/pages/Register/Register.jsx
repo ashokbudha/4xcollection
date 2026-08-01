@@ -1,6 +1,8 @@
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
 import { register as registerUser } from "../../services/auth.service";
+import { toast } from "react-hot-toast";
+
 const Register = () => {
   const {
     register,
@@ -11,13 +13,15 @@ const Register = () => {
 
   const onSubmit = async (data) => {
     try {
-      const result = await registerUser(data);
+      await registerUser(data);
 
-      console.log(result);
-      alert("Registration successful. Please login.");
+      toast.success("Registration successful. Please Login");
       navigate("/login");
     } catch (error) {
-      alert(error.response?.data?.message || "Something went wrong");
+      toast.error(
+        error.response?.data?.message ||
+          "Something went wrong. Please try again.",
+      );
     }
   };
 
@@ -68,6 +72,14 @@ const Register = () => {
               type="text"
               {...register("fullName", {
                 required: "Full name is required",
+                minLength: {
+                  value: 2,
+                  message: "Minimum 2 characters",
+                },
+                maxLength: {
+                  value: 100,
+                  message: "Maximum 100 characters",
+                },
               })}
               autoComplete="name"
               placeholder="Your name"
@@ -90,7 +102,13 @@ const Register = () => {
             <input
               id="signup-email"
               type="email"
-              {...register("email", { required: "Email is required" })}
+              {...register("email", {
+                required: "Email is required",
+                pattern: {
+                  value: /^\S+@\S+\.\S+$/,
+                  message: "Invalid email",
+                },
+              })}
               autoComplete="email"
               placeholder="you@example.com"
               className="w-full rounded-xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40"
@@ -115,6 +133,18 @@ const Register = () => {
               type="text"
               {...register("username", {
                 required: "Username is required",
+                minLength: {
+                  value: 3,
+                  message: "Username must be at least 3 characters",
+                },
+                maxLength: {
+                  value: 30,
+                  message: "Username cannot exceed 30 characters",
+                },
+                pattern: {
+                  value: /^[a-zA-Z0-9_]+$/,
+                  message: "Only letters, numbers and underscores are allowed",
+                },
               })}
               placeholder="Choose a username"
               className="w-full rounded-xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40"
@@ -140,6 +170,10 @@ const Register = () => {
               type="tel"
               {...register("phone", {
                 required: "Phone number is required",
+                pattern: {
+                  value: /^[0-9]{10}$/,
+                  message: "Phone number must be 10 digits",
+                },
               })}
               placeholder="9800000000"
               className="w-full rounded-xl border border-slate-600 bg-slate-900/70 px-4 py-3 text-white outline-none transition placeholder:text-slate-500 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/40"
@@ -192,19 +226,8 @@ const Register = () => {
               id="signup-avatar"
               type="file"
               accept="image/*"
-              {...register("avatar", {
-                required: "Profile picture is required",
-              })}
-              className="block w-full text-sm text-slate-300
-    file:mr-4
-    file:rounded-lg
-    file:border-0
-    file:bg-cyan-500
-    file:px-4
-    file:py-2
-    file:text-white
-    hover:file:bg-cyan-600"
-            />
+              {...register("avatar", {})}
+              className="block w-full text-sm text-slate-300 file:mr-4 file:rounded-lg file:border-0 file:bg-cyan-500 file:px-4 file:py-2 file:text-white hover:file:bg-cyan-600" />
 
             {errors.avatar && (
               <p className="mt-1 text-sm text-red-400">
