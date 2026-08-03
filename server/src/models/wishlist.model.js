@@ -6,11 +6,6 @@ const wishListItemSchema = new mongoose.Schema({
     ref:"Product",
     required:[true,"Product  is required."],
   },
-  variantId:{
-    type:mongoose.Schema.Types.ObjectId,
-    ref:"ProductVariant",
-    required:[true,"Product Variant is required."],
-  },
   createdAt:{
     type:Date,
     default:Date.now,

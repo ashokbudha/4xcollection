@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getProducts } from "../../services/product.service";
 import ProductGrid from "../../components/ProductGrid";
