@@ -1,17 +1,47 @@
 import { ShoppingBag, Search } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { getCategories } from "../../services/category.service";
+import NavbarItem from "./NavbarItem";
+import CategoryDropdown from "./CategoryDropdown";
 
 function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handleLogout = async () => {
     await logout();
     navigate("/");
   };
-  console.log(user);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await getCategories();
+        console.log(response.data);
+        setCategories(response.data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategories();
+  }, []);
+
+  const parentCategories = categories.filter(
+    (category) => category.parentId === null,
+  );
+
+  if (loading) {
+    return <h1>Loading...</h1>;
+  }
+
   return (
     <header className="sticky top-0 z-50 border-b bg-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-10">
@@ -27,25 +57,32 @@ function Navbar() {
         {/* Navigation */}
         <nav className="hidden items-center gap-10 md:flex">
           <Link
-            to="/products"
+            to="/"
             className="border-b-2 border-black pb-1 text-sm font-medium uppercase tracking-wider"
           >
             All
           </Link>
+          <div className="flex items-center gap-8">
+            {parentCategories.map((category) => (
+              <NavbarItem key={category._id} category={category}>
+                <CategoryDropdown parent={category} categories={categories} />
+              </NavbarItem>
+            ))}
+          </div>
 
-          <Link
-            to="/products?category=women"
+          {/* <Link
+            to="/category/women"
             className="text-sm font-medium uppercase tracking-wider text-gray-600 transition hover:text-black"
           >
             Women
           </Link>
 
           <Link
-            to="/products?category=men"
+            to="/category/men"
             className="text-sm font-medium uppercase tracking-wider text-gray-600 transition hover:text-black"
           >
             Men
-          </Link>
+          </Link> */}
         </nav>
 
         {/* Actions */}
@@ -64,8 +101,6 @@ function Navbar() {
           >
             <ShoppingBag size={20} strokeWidth={1.8} />
           </Link>
-
-      
 
           {isAuthenticated ? (
             <>
