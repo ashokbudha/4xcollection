@@ -37,7 +37,7 @@ console.log("loading:", loading);
       <h1>hello</h1>
       <Footer/>
     </div>
-  )
+  );
 }
 
-export default Home
+export default Home;
