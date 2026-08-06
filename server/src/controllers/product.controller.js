@@ -428,6 +428,47 @@ const getProductById = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, product, "Product fetched successfully."));
 });
 
+const getProductBySlug = asyncHandler(async (req, res) => {
+  // ========= MVP =========
+  // 1. Read slug from params
+  // 2. Validate slug
+  // 3. Find product by slug
+  // 4. Populate category
+  // 5. Check product exists
+  // 6. Return response
+
+  // ===== TODO (Future) =====
+  // 7. Increment product view count
+  // 8. Return related products
+  // 9. Track recently viewed products
+
+  // 1. Read slug
+  const { slug } = req.params;
+
+  // 2. Validate slug
+  if (!slug) {
+    throw new ApiError(400, "Product slug is required.");
+  }
+
+  // 3. Find product
+  const product = await Product.findOne({ slug })
+    .populate("categoryId", "name slug");
+
+  // 4. Check product exists
+  if (!product) {
+    throw new ApiError(404, "Product not found.");
+  }
+
+  // 5. Return response
+  return res.status(200).json(
+    new ApiResponse(
+      200,
+      product,
+      "Product fetched successfully."
+    )
+  );
+});
+
 const updateProduct = asyncHandler(async (req, res) => {
   // ========= MVP =========
 
@@ -573,4 +614,5 @@ export {
   getProductById,
   updateProduct,
   deleteProduct,
+  getProductBySlug
 };

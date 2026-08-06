@@ -4,7 +4,7 @@ import {
   useEffect,
   useState,
 } from "react";
-
+import toast from "react-hot-toast";
 import {
   addToWishlist as addWishlistService,
   removeFromWishlist as removeWishlistService,
@@ -54,6 +54,7 @@ export const WishlistProvider = ({ children }) => {
     ? prev
     : [...prev, productId]
 );
+toast.success("Added to wishlist");
     } catch (error) {
       console.error(error);
     }
@@ -66,6 +67,7 @@ export const WishlistProvider = ({ children }) => {
       setWishlist((prev) =>
         prev.filter((id) => id !== productId)
       );
+      toast.success("Removed from wishlist");
     } catch (error) {
       console.error(error);
     }

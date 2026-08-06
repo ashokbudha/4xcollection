@@ -3,12 +3,14 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { verifyAdmin } from "../middlewares/verifyAdmin.middleware.js";
 import { upload } from "../middlewares/multer.middleware.js";
 
+
 import {
   getAllProducts,
   getProductById,
   createProduct,
   updateProduct,
   deleteProduct,
+  getProductBySlug
 } from "../controllers/product.controller.js";
 
 const router = Router();
@@ -18,6 +20,7 @@ const router = Router();
 router.get("/", getAllProducts);
 
 router.get("/:id", getProductById);
+router.get("/slug/:slug", getProductBySlug);
 
 // ---------- Admin ----------
 
