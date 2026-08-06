@@ -1,13 +1,17 @@
-import { useState } from "react";
 import { ShoppingBag, Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
+import { getCategories } from "../../services/category.service";
+import NavbarItem from "./NavbarItem";
+import CategoryDropdown from "./CategoryDropdown";
 
 function Navbar() {
   const { user, isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+  const [categories, setCategories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const handleLogout = async () => {
     await logout();
@@ -90,16 +94,13 @@ function Navbar() {
             <Search size={20} strokeWidth={1.8} />
           </button>
 
-          <button
-            type="button"
-            onClick={() => setIsCartOpen(true)}
-            className="relative text-gray-700 transition hover:text-black"
+          <Link
+            to="/cart"
+            className="text-gray-700 transition hover:text-black"
             aria-label="Cart"
           >
             <ShoppingBag size={20} strokeWidth={1.8} />
           </Link>
-
-      
 
           {isAuthenticated ? (
             <>
@@ -126,11 +127,6 @@ function Navbar() {
           )}
         </div>
       </div>
-      <Cart
-        isOpen={isCartOpen}
-        onClose={() => setIsCartOpen(false)}
-        onItemCountChange={setCartCount}
-      />
     </header>
   );
 }
