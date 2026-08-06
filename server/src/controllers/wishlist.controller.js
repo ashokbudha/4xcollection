@@ -25,14 +25,14 @@ const addToWishlist = asyncHandler(async (req, res) => {
   // Maximum wishlist size
 
   // 1. Read request data
-  const { productId, variantId } = req.body;
+  const { productId } = req.body;
   const userId = req.user._id;
 
   // 2. Validate required fields
-  if (!productId || !variantId) {
+  if (!productId) {
     throw new ApiError(
       400,
-      "Product and variant are required."
+      "Product is required."
     );
   }
 
@@ -48,17 +48,6 @@ const addToWishlist = asyncHandler(async (req, res) => {
     throw new ApiError(404, "Product not found.");
   }
 
-  // 5. Validate variant ID
-  if (!mongoose.Types.ObjectId.isValid(variantId)) {
-    throw new ApiError(400, "Invalid variant ID.");
-  }
-
-  // 6. Check variant exists
-  const variant = product.variants.id(variantId);
-
-  if (!variant) {
-    throw new ApiError(404, "Variant not found.");
-  }
 
   // 7. Get or create user's wishlist
   let wishlist = await Wishlist.findOne({ userId });
@@ -73,8 +62,7 @@ const addToWishlist = asyncHandler(async (req, res) => {
   // 8. Check if item already exists
   const existingItem = wishlist.items.find(
     (item) =>
-      item.productId.toString() === productId &&
-      item.variantId.toString() === variantId
+      item.productId.toString() === productId
   );
 
   if (existingItem) {
@@ -87,7 +75,6 @@ const addToWishlist = asyncHandler(async (req, res) => {
   // 9. Add item to wishlist
   wishlist.items.push({
     productId,
-    variantId,
   });
 
   // 10. Save wishlist
@@ -149,20 +136,21 @@ const getWishlist = asyncHandler(async (req, res) => {
 
 const removeFromWishlist = asyncHandler(async (req, res) => {
   // ========= MVP =========
-  // 1. Read wishlist item ID
-  // 2. Validate item ID
+  // 1. Read product ID
+  // 2. Validate product ID
   // 3. Get user's wishlist
-  // 4. Check item exists
-  // 5. Remove item
-  // 6. Save wishlist
-  // 7. Return response
+  // 4. Check wishlist exists
+  // 5. Check product exists in wishlist
+  // 6. Remove product
+  // 7. Save wishlist
+  // 8. Return response
 
-  // 1. Read wishlist item ID
-  const { itemId } = req.params;
+  // 1. Read product ID
+  const { productId } = req.params;
 
-  // 2. Validate item ID
-  if (!mongoose.Types.ObjectId.isValid(itemId)) {
-    throw new ApiError(400, "Invalid wishlist item ID.");
+  // 2. Validate product ID
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    throw new ApiError(400, "Invalid product ID.");
   }
 
   // 3. Get user's wishlist
@@ -170,33 +158,37 @@ const removeFromWishlist = asyncHandler(async (req, res) => {
     userId: req.user._id,
   });
 
+  // 4. Check wishlist exists
   if (!wishlist) {
     throw new ApiError(404, "Wishlist not found.");
   }
 
-  // 4. Check item exists
-  const item = wishlist.items.id(itemId);
+  // 5. Check product exists in wishlist
+  const item = wishlist.items.find((item) =>
+    item.productId.equals(productId)
+  );
 
   if (!item) {
-    throw new ApiError(404, "Wishlist item not found.");
+    throw new ApiError(404, "Product not found in wishlist.");
   }
 
-  // 5. Remove item
-  item.deleteOne();
+  // 6. Remove product
+  wishlist.items = wishlist.items.filter(
+    (item) => !item.productId.equals(productId)
+  );
 
-  // 6. Save wishlist
+  // 7. Save wishlist
   await wishlist.save();
 
-  // 7. Return response
+  // 8. Return response
   return res.status(200).json(
     new ApiResponse(
       200,
       wishlist,
-      "Item removed from wishlist successfully."
+      "Product removed from wishlist successfully."
     )
   );
 });
-
 
 
 const clearWishlist = asyncHandler(async (req, res) => {

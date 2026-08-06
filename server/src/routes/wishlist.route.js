@@ -17,7 +17,7 @@ router.route("/")
 router.route("/add")
   .post(addToWishlist);
 
-router.route("/item/:itemId")
+router.route("/:productId")
   .delete(removeFromWishlist);
 
 

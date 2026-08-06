@@ -41,29 +41,28 @@ const createProduct = asyncHandler(async (req, res) => {
   if (!mongoose.Types.ObjectId.isValid(categoryId)) {
     throw new ApiError(400, "Invalid category id.");
   }
-let parsedFeatured;
+  let parsedFeatured;
 
-if (featured === "" || featured === undefined) {
-  parsedFeatured = undefined;
-} else if (featured === "true") {
-  parsedFeatured = true;
-} else if (featured === "false") {
-  parsedFeatured = false;
-} else {
-  throw new ApiError(400, "Featured must be true or false.");
-}
-  const allowedStatus = PRODUCT_STATUS;
-  
-
-let parsedStatus = undefined;
-
-if (status?.trim()) {
-  if (!PRODUCT_STATUS.includes(status)) {
-    throw new ApiError(400, "Invalid product status.");
+  if (featured === "" || featured === undefined) {
+    parsedFeatured = undefined;
+  } else if (featured === "true") {
+    parsedFeatured = true;
+  } else if (featured === "false") {
+    parsedFeatured = false;
+  } else {
+    throw new ApiError(400, "Featured must be true or false.");
   }
+  const allowedStatus = PRODUCT_STATUS;
 
-  parsedStatus = status;
-}
+  let parsedStatus = undefined;
+
+  if (status?.trim()) {
+    if (!PRODUCT_STATUS.includes(status)) {
+      throw new ApiError(400, "Invalid product status.");
+    }
+
+    parsedStatus = status;
+  }
 
   //3. Parse Variants JSON
   let parsedVariants;
@@ -267,7 +266,7 @@ if (status?.trim()) {
     description: description?.trim(),
     brand: brand?.trim(),
     featured: parsedFeatured,
-    status:parsedStatus,
+    status: parsedStatus,
     thumbnail: uploadedThumbnail.url,
     variants: mappedVariants,
   });
@@ -278,20 +277,19 @@ if (status?.trim()) {
 });
 
 const getAllProducts = asyncHandler(async (req, res) => {
- 
   // ==========
   // 1. Read page & limit from query
   // 2. Validate page & limit
   // 3. Calculate skip value
+  // 8. Filter by category
   // 4. Get products from database
   // 5. Populate category details
   // 6. Return paginated response
+  // 10. Filter by featured
 
   // ===== TODO (Future) =====
   // 7. Search by product name
-  // 8. Filter by category
   // 9. Filter by brand
-  // 10. Filter by featured
   // 11. Filter by status
   // 12. Filter by price range
   // 13. Sort by newest/oldest
@@ -301,55 +299,91 @@ const getAllProducts = asyncHandler(async (req, res) => {
   // 17. Return pagination metadata
   // 18. Optimize query performance
 
+  // 1. Read page & limit
+const {
+  page = 1,
+  limit = 10,
+  categorySlug,
+  featured,
+} = req.query;
 
-    // 1. Read page & limit
-    const { page = 1, limit = 10 } = req.query;
+  // 2. Validate page & limit
+  const pageNumber = Number(page);
+  const limitNumber = Number(limit);
 
-    // 2. Validate page & limit
-    const pageNumber = Number(page);
-    const limitNumber = Number(limit);
+  if (!Number.isInteger(pageNumber) || pageNumber < 1) {
+    throw new ApiError(400, "Page must be a positive integer.");
+  }
 
-    if (!Number.isInteger(pageNumber) || pageNumber < 1) {
-        throw new ApiError(400, "Page must be a positive integer.");
-    }
+  if (!Number.isInteger(limitNumber) || limitNumber < 1) {
+    throw new ApiError(400, "Limit must be a positive integer.");
+  }
+  if (limitNumber > 100) {
+    throw new ApiError(400, "Limit cannot exceed 100.");
+  }
 
-    if (!Number.isInteger(limitNumber) || limitNumber < 1) {
-        throw new ApiError(400, "Limit must be a positive integer.");
-    }
-    if (limitNumber > 100) {
-  throw new ApiError(400, "Limit cannot exceed 100.");
+  // 3. Calculate skip
+  const skip = (pageNumber - 1) * limitNumber;
+
+  const filter = {};
+
+if (categorySlug) {
+  const category = await Category.findOne({
+    slug: categorySlug,
+  });
+
+  if (!category) {
+    throw new ApiError(404, "Category not found.");
+  }
+
+  const childCategories = await Category.find({
+    parentId: category._id,
+  });
+
+  if (childCategories.length > 0) {
+    filter.categoryId = {
+      $in: childCategories.map((category) => category._id),
+    };
+  } else {
+    filter.categoryId = category._id;
+  }
 }
 
-    // 3. Calculate skip
-    const skip = (pageNumber - 1) * limitNumber;
+  // Filter by featured
+if (featured !== undefined) {
+  if (featured !== "true" && featured !== "false") {
+    throw new ApiError(
+      400,
+      "Featured must be either 'true' or 'false'."
+    );
+  }
 
+  filter.featured = featured === "true";
+}
 
-//  4. Get products from database
-  const products = await Product.find()
-  .populate("categoryId", "name slug")
-  .sort({ createdAt: -1 })
-  .skip(skip)
-  .limit(limitNumber);
+  //  4. Get products from database
+  const products = await Product.find(filter)
+    .populate("categoryId", "name slug")
+    .sort({ createdAt: -1 })
+    .skip(skip)
+    .limit(limitNumber);
 
- // 5. Return response
+  // 5. Return response
   return res.status(200).json(
-  new ApiResponse(
-    200,
-    {
-      page: pageNumber,
-      limit: limitNumber,
-      products,
-    },
-    "Products fetched successfully."
-  )
-);
-
-
-
+    new ApiResponse(
+      200,
+      {
+        page: pageNumber,
+        limit: limitNumber,
+        products,
+      },
+      "Products fetched successfully."
+    )
+  );
 });
 
 const getProductById = asyncHandler(async (req, res) => {
-    // ========= MVP =========
+  // ========= MVP =========
 
   // 1. Read product ID from request
   // 2. Validate product ID
@@ -369,9 +403,8 @@ const getProductById = asyncHandler(async (req, res) => {
   // 13. Check cart status
   // 14. Return stock availability by variant
 
-   // 1. Read product ID
-  const { id:productId } = req.params;
-
+  // 1. Read product ID
+  const { id: productId } = req.params;
 
   // 2. Validate product ID
   if (!mongoose.Types.ObjectId.isValid(productId)) {
@@ -390,6 +423,43 @@ const getProductById = asyncHandler(async (req, res) => {
   }
 
   // 6. Return response
+  return res
+    .status(200)
+    .json(new ApiResponse(200, product, "Product fetched successfully."));
+});
+
+const getProductBySlug = asyncHandler(async (req, res) => {
+  // ========= MVP =========
+  // 1. Read slug from params
+  // 2. Validate slug
+  // 3. Find product by slug
+  // 4. Populate category
+  // 5. Check product exists
+  // 6. Return response
+
+  // ===== TODO (Future) =====
+  // 7. Increment product view count
+  // 8. Return related products
+  // 9. Track recently viewed products
+
+  // 1. Read slug
+  const { slug } = req.params;
+
+  // 2. Validate slug
+  if (!slug) {
+    throw new ApiError(400, "Product slug is required.");
+  }
+
+  // 3. Find product
+  const product = await Product.findOne({ slug })
+    .populate("categoryId", "name slug");
+
+  // 4. Check product exists
+  if (!product) {
+    throw new ApiError(404, "Product not found.");
+  }
+
+  // 5. Return response
   return res.status(200).json(
     new ApiResponse(
       200,
@@ -397,7 +467,6 @@ const getProductById = asyncHandler(async (req, res) => {
       "Product fetched successfully."
     )
   );
-
 });
 
 const updateProduct = asyncHandler(async (req, res) => {
@@ -424,21 +493,14 @@ const updateProduct = asyncHandler(async (req, res) => {
   // 16. Bulk update products
   // 17. Optimistic concurrency/version control
 
-   // 1. Read request
-  const { id:productId } = req.params;
+  // 1. Read request
+  const { id: productId } = req.params;
 
   console.log("Params:", req.params);
-console.log("Headers:", req.headers["content-type"]);
-console.log("Body:", req.body);
+  console.log("Headers:", req.headers["content-type"]);
+  console.log("Body:", req.body);
 
-  const {
-    categoryId,
-    name,
-    description,
-    brand,
-    featured,
-    status,
-  } = req.body;
+  const { categoryId, name, description, brand, featured, status } = req.body;
 
   // 2. Validate product ID
   if (!mongoose.Types.ObjectId.isValid(productId)) {
@@ -454,17 +516,11 @@ console.log("Body:", req.body);
 
   // 4. Validate request data
 
-  if (
-    featured !== undefined &&
-    typeof featured !== "boolean"
-  ) {
+  if (featured !== undefined && typeof featured !== "boolean") {
     throw new ApiError(400, "Featured must be boolean.");
   }
 
-  if (
-    status !== undefined &&
-    !PRODUCT_STATUS.includes(status)
-  ) {
+  if (status !== undefined && !PRODUCT_STATUS.includes(status)) {
     throw new ApiError(400, "Invalid product status.");
   }
 
@@ -489,10 +545,7 @@ console.log("Body:", req.body);
     });
 
     if (existingProduct) {
-      throw new ApiError(
-        409,
-        "Product with this name already exists."
-      );
+      throw new ApiError(409, "Product with this name already exists.");
     }
   }
 
@@ -501,30 +554,20 @@ console.log("Body:", req.body);
 
   if (name) product.name = name.trim();
 
-  if (description !== undefined)
-    product.description = description.trim();
+  if (description !== undefined) product.description = description.trim();
 
-  if (brand !== undefined)
-    product.brand = brand.trim();
+  if (brand !== undefined) product.brand = brand.trim();
 
-  if (featured !== undefined)
-    product.featured = featured;
+  if (featured !== undefined) product.featured = featured;
 
-  if (status !== undefined)
-    product.status = status;
+  if (status !== undefined) product.status = status;
 
   await product.save();
 
   // 8. Return response
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      product,
-      "Product updated successfully."
-    )
-  );
-
-
+  return res
+    .status(200)
+    .json(new ApiResponse(200, product, "Product updated successfully."));
 });
 
 const deleteProduct = asyncHandler(async (req, res) => {
@@ -542,7 +585,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
   // Restore deleted product
 
   // 1. Read product ID
-  const { id:productId } = req.params;
+  const { id: productId } = req.params;
 
   // 2. Validate product ID
   if (!mongoose.Types.ObjectId.isValid(productId)) {
@@ -557,17 +600,12 @@ const deleteProduct = asyncHandler(async (req, res) => {
   }
 
   // 4. Permanently delete
-    await Product.findByIdAndDelete(productId);
-
+  await Product.findByIdAndDelete(productId);
 
   // 5. Return response
-  return res.status(200).json(
-    new ApiResponse(
-      200,
-      null,
-      "Product deleted successfully."
-    )
-  );
+  return res
+    .status(200)
+    .json(new ApiResponse(200, null, "Product deleted successfully."));
 });
 
 export {
@@ -576,4 +614,5 @@ export {
   getProductById,
   updateProduct,
   deleteProduct,
+  getProductBySlug
 };
