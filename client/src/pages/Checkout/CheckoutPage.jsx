@@ -1,8 +1,8 @@
 import Navbar from "../../components/Navbar/Navbar";
 import Footer from "../../components/Footer";
 
-import CheckoutForm from "../../components/checkout/CheckoutForm";
-import CheckoutSummary from "../../components/checkout/CheckoutSummary";
+import CheckoutForm from "../../components/Checkout/CheckoutForm";
+import CheckoutSummary from "../../components/Checkout/CheckoutSummary";
 
 import { useCart } from "../../context/CartContext";
 
