@@ -5,7 +5,7 @@ const CartList = () => {
   console.log(`cart items:${cartItems}`)
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 ">
       {cartItems.map((item) => (
         <CartItem
           key={item._id}

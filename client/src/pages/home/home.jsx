@@ -34,7 +34,6 @@ console.log("loading:", loading);
       <Navbar/>
       <Hero/>
       <FeaturedProduct  products={featuredProducts} loading={loading} />
-      <h1>hello</h1>
       <Footer/>
     </div>
   );

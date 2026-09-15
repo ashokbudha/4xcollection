@@ -1,15 +1,23 @@
-import { ShoppingBag, Search } from "lucide-react";
+import {
+  ShoppingBag,
+  Search,
+  Heart,
+  UserRound,
+} from "lucide-react";
+
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
 import { useAuth } from "../../context/AuthContext";
-import { useNavigate } from "react-router-dom";
 import { getCategories } from "../../services/category.service";
+
 import NavbarItem from "./NavbarItem";
 import CategoryDropdown from "./CategoryDropdown";
 
 function Navbar() {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
+
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -22,7 +30,7 @@ function Navbar() {
     const fetchCategories = async () => {
       try {
         const response = await getCategories();
-        console.log(response.data);
+
         setCategories(response.data);
       } catch (error) {
         console.error(error);
@@ -35,7 +43,7 @@ function Navbar() {
   }, []);
 
   const parentCategories = categories.filter(
-    (category) => category.parentId === null,
+    (category) => category.parentId === null
   );
 
   if (loading) {
@@ -45,8 +53,8 @@ function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b bg-white">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 lg:px-10">
-        {/* Logo */}
 
+        {/* ================= LOGO ================= */}
         <Link
           to="/"
           className="text-2xl font-bold tracking-[0.35em] text-black"
@@ -54,76 +62,92 @@ function Navbar() {
           4X<span className="font-light">COLLECTION</span>
         </Link>
 
-        {/* Navigation */}
+        {/* ================= NAVIGATION ================= */}
         <nav className="hidden items-center gap-10 md:flex">
+
+          {/* All */}
           <Link
             to="/"
             className="border-b-2 border-black pb-1 text-sm font-medium uppercase tracking-wider"
           >
             All
           </Link>
+
+          {/* Categories */}
           <div className="flex items-center gap-8">
             {parentCategories.map((category) => (
-              <NavbarItem key={category._id} category={category}>
-                <CategoryDropdown parent={category} categories={categories} />
+              <NavbarItem
+                key={category._id}
+                category={category}
+              >
+                <CategoryDropdown
+                  parent={category}
+                  categories={categories}
+                />
               </NavbarItem>
             ))}
           </div>
-
-          {/* <Link
-            to="/category/women"
-            className="text-sm font-medium uppercase tracking-wider text-gray-600 transition hover:text-black"
-          >
-            Women
-          </Link>
-
-          <Link
-            to="/category/men"
-            className="text-sm font-medium uppercase tracking-wider text-gray-600 transition hover:text-black"
-          >
-            Men
-          </Link> */}
         </nav>
 
-        {/* Actions */}
+        {/* ================= ACTIONS ================= */}
         <div className="flex items-center gap-5">
-          <button
+
+          {/* Search */}
+          <Link
+            to="/search"
             className="text-gray-700 transition hover:text-black"
             aria-label="Search"
           >
-            <Search size={20} strokeWidth={1.8} />
-          </button>
+            <Search
+              size={20}
+              strokeWidth={1.8}
+            />
+          </Link>
 
+          {/* Wishlist */}
+          <Link
+            to="/wishlist"
+            className="text-gray-700 transition hover:text-red-500"
+            aria-label="Wishlist"
+          >
+            <Heart
+              size={20}
+              strokeWidth={1.8}
+            />
+          </Link>
+
+          {/* Cart */}
           <Link
             to="/cart"
             className="text-gray-700 transition hover:text-black"
             aria-label="Cart"
           >
-            <ShoppingBag size={20} strokeWidth={1.8} />
+            <ShoppingBag
+              size={20}
+              strokeWidth={1.8}
+            />
           </Link>
 
-          {isAuthenticated ? (
-            <>
-              <span className="text-sm font-medium">Hi, {user.fullName}</span>
+          {/* Profile */}
+          <Link
+            to="/profile"
+            className="text-gray-700 transition hover:text-black"
+            aria-label="Profile"
+          >
+            <UserRound
+              size={20}
+              strokeWidth={1.8}
+            />
+          </Link>
 
-              <button onClick={handleLogout}>Logout</button>
-            </>
-          ) : (
-            <>
-              <Link
-                to="/login"
-                className="hidden rounded-md border border-black px-4 py-2 text-sm font-medium transition hover:bg-black hover:text-white lg:block"
-              >
-                Login
-              </Link>
-
-              <Link
-                to="/register"
-                className="hidden rounded-md bg-black px-4 py-2 text-sm font-medium text-white transition hover:bg-gray-800 lg:block"
-              >
-                Sign Up
-              </Link>
-            </>
+          {/* Logout */}
+          {isAuthenticated && (
+            <button
+              onClick={handleLogout}
+              className="hidden text-sm font-medium text-gray-600 transition hover:text-black lg:block"
+            >
+              Logout
+            </button>
           )}
         </div>
       </div>

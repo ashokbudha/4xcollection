@@ -4,6 +4,7 @@ import {
   useEffect,
   useState,
 } from "react";
+
 import toast from "react-hot-toast";
 
 import { useAuth } from "./AuthContext";
@@ -24,14 +25,9 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState(null);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      fetchCart();
-    } else {
-      setCart(null);
-      setLoading(false);
-    }
-  }, [isAuthenticated]);
+  // ==========================================
+  // FETCH CART
+  // ==========================================
 
   const fetchCart = async () => {
     try {
@@ -41,96 +37,171 @@ export const CartProvider = ({ children }) => {
 
       setCart(response.data);
     } catch (error) {
-      console.error(error);
+      console.error("Failed to fetch cart:", error);
     } finally {
       setLoading(false);
     }
   };
 
-const addToCart = async ({
-  productId,
-  variantId,
-  quantity = 1,
-}) => {
-  try {
-    const response = await addCartService({
-      productId,
-      variantId,
-      quantity,
-    });
+  // ==========================================
+  // FETCH CART WHEN AUTH STATE CHANGES
+  // ==========================================
 
-    setCart(response.data);
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchCart();
+    } else {
+      setCart(null);
+      setLoading(false);
+    }
+  }, [isAuthenticated]);
 
-    toast.success("Added to cart");
-  } catch (error) {
-    toast.error(
+  // ==========================================
+  // ADD TO CART
+  // ==========================================
 
-      error.response?.data?.message || "Failed to add to cart"
-    );
-    throw error;
-  }
-};
+  const addToCart = async ({
+    productId,
+    variantId,
+    quantity = 1,
+  }) => {
+    try {
+      await addCartService({
+        productId,
+        variantId,
+        quantity,
+      });
+
+      // Get fully populated cart
+      await fetchCart();
+
+      toast.success("Added to cart");
+    } catch (error) {
+      console.error("Add to cart error:", error);
+
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to add to cart"
+      );
+
+      throw error;
+    }
+  };
+
+  // ==========================================
+  // UPDATE CART ITEM
+  // ==========================================
 
   const updateCartItem = async (
     itemId,
     quantity
   ) => {
     try {
-      const response = await updateCartItemService(
+      await updateCartItemService(
         itemId,
         quantity
       );
 
-console.log(response.data);
+      // Get fully populated cart
+      await fetchCart();
 
-
-      setCart(response.data);
       toast.success("Cart updated.");
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Update cart item error:",
+        error
+      );
+
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to update cart."
+      );
+
       throw error;
     }
   };
-  
+
+  // ==========================================
+  // REMOVE CART ITEM
+  // ==========================================
 
   const removeCartItem = async (itemId) => {
     try {
-      const response = await removeCartItemService(
-        itemId
+      await removeCartItemService(itemId);
+
+      // Get fully populated cart
+      await fetchCart();
+
+      toast.success(
+        "Product removed from cart."
+      );
+    } catch (error) {
+      console.error(
+        "Remove cart item error:",
+        error
       );
 
-      setCart(response.data);
-      toast.success("Product removed from cart.");
-    } catch (error) {
-     toast.error("Failed to remove product.");
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to remove product."
+      );
+
       throw error;
     }
   };
+
+  // ==========================================
+  // CLEAR CART
+  // ==========================================
 
   const clearCart = async () => {
     try {
-      const response = await clearCartService();
+      await clearCartService();
 
-      setCart(response.data);
+      // Get latest cart
+      await fetchCart();
+
       toast.success("Cart cleared.");
     } catch (error) {
-    toast.error("Failed to clear cart.");
+      console.error(
+        "Clear cart error:",
+        error
+      );
+
+      toast.error(
+        error.response?.data?.message ||
+          "Failed to clear cart."
+      );
+
       throw error;
     }
   };
 
+  // ==========================================
+  // CART ITEMS
+  // ==========================================
+
   const cartItems = cart?.items || [];
 
+  // ==========================================
+  // CART COUNT
+  // ==========================================
+
   const cartCount = cartItems.reduce(
-    (total, item) => total + item.quantity,
+    (total, item) =>
+      total + (item.quantity || 0),
     0
   );
+
+  // ==========================================
+  // CART SUBTOTAL
+  // ==========================================
 
   const cartSubtotal = cartItems.reduce(
     (total, item) =>
       total +
-      item.quantity *
-        (item.variantId?.price || 0),
+      (item.quantity || 0) *
+        (item.unitPrice || 0),
     0
   );
 
@@ -156,4 +227,5 @@ console.log(response.data);
   );
 };
 
-export const useCart = () => useContext(CartContext);
+export const useCart = () =>
+  useContext(CartContext);

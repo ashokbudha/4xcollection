@@ -18,7 +18,7 @@ const EmptyCart = () => {
       </p>
 
       <Link
-        to="/products"
+        to="/"
         className="mt-8 inline-block rounded-lg bg-black px-8 py-3 font-medium text-white transition hover:bg-gray-800"
       >
         Continue Shopping

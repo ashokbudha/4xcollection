@@ -7,10 +7,10 @@ const CartItem = ({ item }) => {
     removeCartItem,
   } = useCart();
 
-  // Find the selected variant
-  const selectedVariant = item.productId.variants.find(
+  // Find selected variant safely
+  const selectedVariant = item.productId?.variants?.find(
     (variant) =>
-      variant._id.toString() === item.variantId.toString()
+      variant._id?.toString() === item.variantId?.toString()
   );
 
   const increaseQuantity = () => {
@@ -29,10 +29,11 @@ const CartItem = ({ item }) => {
 
   return (
     <div className="flex gap-6 rounded-2xl border bg-white p-5 shadow-sm">
+
       {/* Product Image */}
       <img
-        src={item.productId.thumbnail}
-        alt={item.productId.name}
+        src={item.productId?.thumbnail}
+        alt={item.productId?.name}
         className="h-36 w-28 rounded-xl object-cover"
       />
 
@@ -40,21 +41,27 @@ const CartItem = ({ item }) => {
       <div className="flex flex-1 flex-col justify-between">
         <div>
           <h2 className="text-lg font-semibold">
-            {item.productId.name}
+            {item.productId?.name}
           </h2>
 
+          {/* Selected Variant */}
           <p className="mt-1 text-sm text-gray-500">
-            {selectedVariant?.color} / {selectedVariant?.size}
+            {selectedVariant?.color || "Color"}{" "}
+            /{" "}
+            {selectedVariant?.size || "Size"}
           </p>
 
+          {/* Unit Price */}
           <p className="mt-3 text-xl font-bold">
             Rs. {item.unitPrice}
           </p>
         </div>
 
         <div className="mt-5 flex items-center justify-between">
+
           {/* Quantity */}
           <div className="flex items-center overflow-hidden rounded-lg border">
+
             <button
               onClick={decreaseQuantity}
               disabled={item.quantity === 1}
@@ -73,6 +80,7 @@ const CartItem = ({ item }) => {
             >
               <Plus size={16} />
             </button>
+
           </div>
 
           {/* Remove */}
@@ -82,6 +90,7 @@ const CartItem = ({ item }) => {
           >
             <Trash2 size={20} />
           </button>
+
         </div>
       </div>
 
@@ -91,6 +100,7 @@ const CartItem = ({ item }) => {
           Rs. {item.unitPrice * item.quantity}
         </span>
       </div>
+
     </div>
   );
 };
