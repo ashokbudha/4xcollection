@@ -10,6 +10,7 @@ import wishlistRouter  from "./routes/wishlist.route.js";
 import addressRouter from "./routes/address.route.js";
 import orderRouter from  "./routes/order.route.js";
 import dashboardRouter from "./routes/dashboard.route.js"
+import healthRouter from "./routes/health.route.js"
 
 const app = express();
 
@@ -56,6 +57,8 @@ app.use("/api/v1/wishlist", wishlistRouter);
 app.use("/api/v1/addresses", addressRouter);
 app.use("/api/v1/orders", orderRouter);
 app.use("/api/v1/dashboard",dashboardRouter);
+app.use("/api/v1/health",healthRouter);
+
 
 // Error Handler (Always Last)
 app.use(errorHandler);
